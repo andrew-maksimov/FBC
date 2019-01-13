@@ -7,12 +7,15 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private int poolSize = 10;
     private Transform[] pipePool;
+    [SerializeField]
+    private GameObject pipePrefab;
 
     [SerializeField]
     private float shiftSpeed = 2;
-    
 
-    public GameObject pipePrefab;
+    private float spawnTimer = 0;
+    [SerializeField]
+    private float spawnRate = 0.5f;
 
     #region MonoBehaviour CallBacks
 
@@ -24,15 +27,9 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < pipePool.Length; i++)
         {
             GameObject go = Instantiate(pipePrefab) as GameObject;
-
-            go.transform.position = new Vector3(Random.Range(-5.0f, 5.0f), Random.Range(-5.0f, 5.0f), 0);
+            go.SetActive(false);
             pipePool[i] = go.transform;
         }
-    }
-
-    void Start()
-    {
-        
     }
     
     void Update()
@@ -47,16 +44,33 @@ public class GameManager : MonoBehaviour
     {
         for (int i = 0; i < pipePool.Length; i++)
         {
-            pipePool[i].transform.position += Vector3.left * shiftSpeed * Time.deltaTime;
+            pipePool[i].position += Vector3.left * shiftSpeed * Time.deltaTime;
 
-            if (pipePool[i].position.x < -cameraHalfWidth)
+            if (pipePool[i].gameObject.activeSelf && pipePool[i].position.x < -cameraHalfWidth)
             {
-                pipePool[i].transform.position -= Vector3.left * cameraHalfWidth * 2;
+                pipePool[i].gameObject.SetActive(false);
             }
         }
     }
 
+    
     private void Spawn()
     {
+        spawnTimer += Time.deltaTime;
+        if (spawnTimer > spawnRate)
+        {
+            for (int i = 0; i < pipePool.Length; i++)
+            {
+                if (!pipePool[i].gameObject.activeSelf)
+                {
+                    pipePool[i].position = (Vector3.right * cameraHalfWidth) + (Vector3.up * Random.Range(-2.8f, 2.8f));
+                    pipePool[i].gameObject.SetActive(true);
+
+                    break;
+                }
+            }
+            
+            spawnTimer = 0;
+        }
     }
 }
