@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - Pipe
+  - Boundary
   layers:
   - Default
   - TransparentFX
